@@ -3,6 +3,7 @@ testing.ipynb
 testing.py
 dataset/
 checkpoints/
+dataset.zip
 
 # Python
 *.pyc

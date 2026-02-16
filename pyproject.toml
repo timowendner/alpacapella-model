@@ -17,12 +17,9 @@ classifiers = [
 ]
 dependencies = [
     "wandb",
-    "numpy<2",
-    "pandas",
-    "matplotlib",
+    "numpy",
     "librosa",
     "soundfile",
-    "numba",
     "pytorch_lightning",
     "torch",
     "torchaudio",
