@@ -2,6 +2,7 @@
 testing.ipynb
 testing.py
 dataset/
+checkpoints/
 
 # Python
 *.pyc

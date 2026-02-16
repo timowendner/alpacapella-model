@@ -1,0 +1,19 @@
+model_name = "Testing"
+
+[model]
+embed_size = 256
+n_layers = 24
+head_dim = 32
+mlp_hidden_dim = 512
+
+[training]
+epochs = 10
+lr = 0.0005
+batch_size = 8
+
+[dataset]
+window_sizes = [320, 480, 640, 800]
+hop_size = 320
+n_mels = 128
+sample_rate = 16000
+input_size_seconds = 30

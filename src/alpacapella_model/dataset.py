@@ -4,7 +4,7 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 import torchaudio.transforms as T
-import torchaudio.functional as F
+import torch.nn.functional as F
 import csv
 from pathlib import Path
 
@@ -35,70 +35,70 @@ class BeatDataset(Dataset):
         return len(self.audio_paths)
 
     def __getitem__(self, idx):
-        config = self.config
+        param = self.config['dataset']
         audio_path = self.audio_paths[idx]
         waveform, sr = torchaudio.load(str(audio_path))
         annotations_path = self.annotations_paths[idx]
         annotation = np.loadtxt(annotations_path)
 
-        length =  int(config["input_size_seconds"] * sr)
+        length =  int(param["input_size_seconds"] * sr)
         start = random.randint(0, max(0, waveform.shape[1] - length))
         waveform = waveform[:, start:]
         start_sec = start / sr
 
 
-        data_length = config["input_size_seconds"] * sr
+        data_length = param["input_size_seconds"] * sr
         waveform = waveform[:, :data_length]
         if waveform.shape[1] < data_length:
             waveform = F.pad(waveform, (0, data_length - waveform.shape[1]))
 
 
-        if sr != config["sample_rate"]:
-            resampler = T.Resample(sr, config["sample_rate"])
+        if sr != param["sample_rate"]:
+            resampler = T.Resample(sr, param["sample_rate"])
             waveform = resampler(waveform)
-            sr = config["sample_rate"]
+            sr = param["sample_rate"]
 
             
         spectrograms = self.compute_spectrogram(waveform, sr)
         annotation = self.compute_annotation(
-            annotation, spectrograms.shape[1], start_sec, sr
+            annotation, spectrograms.shape[0], start_sec, sr
         )
         return spectrograms, annotation
     
     def compute_annotation(self, annotation, total_frames, start_sec, sr):
-        config = self.config
-        output = torch.zeros((1, total_frames, 3))
-        output[0, :, 0] = 1
+        param = self.config['dataset']
+        output = torch.zeros((total_frames, 3))
+        output[:, 0] = 1
         for time, measure in annotation:
-            frame = int((time - start_sec) * sr / config["hop_size"])
+            frame = int((time - start_sec) * sr / param["hop_size"])
             if not (0 <= frame < total_frames):
                 continue
-            output[0, frame, 0] = 0
+            output[frame, 0] = 0
             if measure == 1:
-                output[0, frame, 2] = 1
+                output[frame, 2] = 1
             else:
-                output[0, frame, 1] = 1
+                output[frame, 1] = 1
         return output
 
 
 
     def compute_spectrogram(self, waveform, sr):
-        config = self.config
+        param = self.config['dataset']
 
         mel_specs = []
-        for window_size in config["window_sizes"]:
+        for window_size in param["window_sizes"]:
             mel_transform = T.MelSpectrogram(
                 sample_rate=sr,
                 n_fft=window_size,
-                hop_length=config["hop_size"],
-                n_mels=config["n_mels"],
+                hop_length=param["hop_size"],
+                n_mels=param["n_mels"],
                 f_min=30,
                 f_max=sr//2,
                 power=2.0
             )
             mel_spec = mel_transform(waveform)
             mel_spec = T.AmplitudeToDB()(mel_spec)
+            mel_spec = mel_spec.permute(2, 1, 0)
             mel_specs.append(mel_spec)
-        spectrograms = torch.stack(mel_specs, dim=-1)
-        spectrograms = spectrograms.permute(0, 2, 1, 3)
+        spectrograms = torch.cat(mel_specs, dim=2)
         return spectrograms
