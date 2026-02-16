@@ -1,0 +1,117 @@
+# General
+testing.ipynb
+testing.py
+dataset/
+
+# Python
+*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+tempCodeRunnerFile.py
+__pycache__/*
+.installed.cfg
+*.egg-info/
+*.egg-info
+*.egg
+MANIFEST
+*.ipynb
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.idea/
+*.swp
+*.swo
+*~
+.vscode
+.vscode/
+*.code-workspace
+
+# OS
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter
+*.ipynb_checkpoints
+.ipynb_checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3.DS_Store
+**/.DS_Store
+
+
+# LaTeX
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.pdf
+report/*.fdb_latexmk
+report/*.fls
+report/*.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.bcf
+*.cut
+*.fdb_latexmk
+*.fls
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.log
+*.lof
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz*
+*.synctex(busy)
+*.thm
+*.toc
+*.vrb
+*.xdv
+.~*#
+*~
+/main.pdf
+/main-*.pdf
+/report/jku-templates-report-latex-master/*
+/report/out/*
+*.png

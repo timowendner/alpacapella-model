@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alpacapella_model"
+version = "1.0"
+authors = [
+  { name="Timo Wendner", email="timo.wendner@gmail.com" },
+]
+description = "Python Project to train Deep-Learning models for detecting Rap Acapellas"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy<2",
+    "pandas",
+    "matplotlib",
+    "librosa",
+    "soundfile",
+    "numba",
+    "pytorch_lightning",
+    "torch",
+    "torchaudio",
+    "mir_eval",
+]
+
+[project.urls]
+Homepage = "https://github.com/timowendner/alpacapella-model"
