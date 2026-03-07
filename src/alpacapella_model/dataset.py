@@ -17,17 +17,17 @@ class BeatDataset(Dataset):
 
         csv_path = Path(csv_path)
         with open(csv_path, 'r') as f:
-            metadata = list(csv.DictReader(f))
+            dataset_metadata = list(csv.DictReader(f))
 
-        for dataset_metadata in metadata:
-            if dataset_metadata['split'] != split:
-                continue
-            dataset_csv_path = csv_path.parent / dataset_metadata['dataset_csv_path']
+        for metadata in dataset_metadata:
+            dataset_csv_path = csv_path.parent / metadata['csv_path']
             with open(dataset_csv_path, 'r') as f:
                 dataset_csv = list(csv.DictReader(f))
             for sample in dataset_csv:
-                audio_path = dataset_csv_path.parent / sample["audio"]
-                annotations_path = dataset_csv_path.parent / sample["annotations"]
+                if sample['split'] != split:
+                    continue
+                audio_path = dataset_csv_path.parent / sample["audio_path"]
+                annotations_path = dataset_csv_path.parent / sample["annotation_path"]
                 self.audio_paths.append(audio_path)
                 self.annotations_paths.append(annotations_path)
 
@@ -67,18 +67,27 @@ class BeatDataset(Dataset):
     
     def compute_annotation(self, annotation, total_frames, start_sec, sr):
         param = self.config['dataset']
-        output = torch.zeros((total_frames, 3))
-        output[:, 0] = 1
+        beats = torch.zeros(total_frames).float()
+        downbeats = torch.zeros(total_frames).float()
         for time, measure in annotation:
             frame = int((time - start_sec) * sr / param["hop_size"])
             if not (0 <= frame < total_frames):
                 continue
-            output[frame, 0] = 0
             if measure == 1:
-                output[frame, 2] = 1
-            else:
-                output[frame, 1] = 1
-        return output
+                downbeats[frame] = 1
+            beats[frame] = 1
+
+        kernel_size = param["frame_spread"]
+        padding = kernel_size // 2
+        
+        beats = F.max_pool1d(
+            beats.view(1, 1, -1), kernel_size=kernel_size, stride=1, padding=padding
+        ).view(-1)
+        downbeats = F.max_pool1d(
+            downbeats.view(1, 1, -1), kernel_size=kernel_size, stride=1, padding=padding
+        ).view(-1)
+
+        return torch.stack([beats, downbeats], dim=1)
 
 
 

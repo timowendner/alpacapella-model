@@ -12,7 +12,6 @@ import math
 from torch import nn
 from .transformer import RoFormer
 
-
 class BeatModel(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -38,7 +37,7 @@ class BeatModel(nn.Module):
             embed_size, param['n_layers'], n_heads,
             param['mlp_hidden_dim'], max_seq_length
         )
-        self.output = nn.Linear(embed_size, 3)
+        self.output = nn.Linear(embed_size, 2)
         
     def forward(self, x):
         B, T, F, C = x.shape
@@ -49,4 +48,5 @@ class BeatModel(nn.Module):
         x = self.linear(x)
         x = self.roformer(x)
         x = self.output(x)
+        x[..., 0] += x[..., 1]
         return x
